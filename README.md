@@ -45,7 +45,7 @@ Keterangan:
 
 Pembuatan Tree:
 
-![Img](https://github.com/riclown/Jarkom_modul5_praktikum_C12/blob/main/img/tree.jpg)
+![Img](https://github.com/riclown/Jarkom_modul5_praktikum_C12/blob/main/img/tree.png)
 
  ________ ___________ _________ 
 | Subnet |    Host   | Length  |
@@ -58,7 +58,6 @@ Pembuatan Tree:
 | A6     |  3        | 30      | 
 |Total   | 419       | 23      |
 --------------------------------
-
  ________ ___________ _________ ______________ ________________ ______________ 
 | Subnet | Jumlah IP | Submask |      NID     |     Netmask    | Broadcast ID |
 |--------|-----------|---------|--------------|----------------|--------------|
@@ -71,6 +70,36 @@ Pembuatan Tree:
 -------------------------------------------------------------------------------
 
 **(C)** Melakukan Routing
+
+Sintaks untuk **topo.sh**
+
+```
+# Switch
+uml_switch -unix switch1 > /dev/null < /dev/null &
+uml_switch -unix switch2 > /dev/null < /dev/null &
+uml_switch -unix switch3 > /dev/null < /dev/null &
+
+# Router
+xterm -T SURABAYA -e linux ubd0=SURABAYA,jarkom umid=SURABAYA eth0=tuntap,,,10.151.76.53 eth1=daemon,,,switch1 eth2=daemon,,,switch3 eth3=daemon,,,switch2 mem=256M &
+
+# Server switch 2
+xterm -T MALANG -e linux ubd0=MALANG,jarkom umid=MALANG eth0=daemon,,,switch2 mem=160M &
+xterm -T MOJOKERTO -e linux ubd0=MOJOKERTO,jarkom umid=MOJOKERTO eth0=daemon,,,switch2 mem=128M &
+xterm -T TUBAN -e linux ubd0=TUBAN,jarkom umid=TUBAN eth0=daemon,,,switch2 mem=128M &
+
+# Klien switch 1
+xterm -T SIDOARJO -e linux ubd0=SIDOARJO,jarkom umid=SIDOARJO eth0=daemon,,,switch1 mem=64M &
+xterm -T GRESIK -e linux ubd0=GRESIK,jarkom umid=GRESIK eth0=daemon,,,switch1 mem=64M &
+
+# Klien switch 3
+xterm -T BANYUWANGI -e linux ubd0=BANYUWANGI,jarkom umid=BANYUWANGI eth0=daemon,,,switch3 mem=64M &
+xterm -T MADIUN -e linux ubd0=MADIUN,jarkom umid=MADIUN eth0=daemon,,,switch3 mem=64M &
+```
+![Img](https://github.com/riclown/Jarkom_modul5_praktikum_C12/blob/main/img/topo.jpg)
+
+Lalu  jalankan `bash topo.sh` pada *putty* dan masukkan *username* dan *password* default. Pada router **SURABAYA**, **BATU**, **KEDIRI**  lakukan setting `sysctl` dengan mengetikkan perintah `nano /etc/sysctl.conf`, dan tambahkan `net.ipv4.conf.all.accept_source_route = 1`.
+
+Lalu setting IP pada setiap *interfaces* uml dengan mengetikkan `nano /etc/network/interfaces` sebagai berikut:
 
 **SURABAYA**
 
@@ -220,6 +249,20 @@ address 192.168.2.2
 netmask 255.255.255.0
 gateway 192.168.2.1
 ```
+
+Lakukan proses routing dari **SURABAYA** ke subnet yang tidak berhubungan secara langsung dengan membuat script yang bernama `rute.sh` di **SURABAYA**, dan masukkan sintaks berikut:
+
+```
+route add -net 10.151.77.104 netmask 255.255.255.248 gw 192.168.0.2 #A1
+route add -net 192.168.1.0 netmask 255.255.255.0 gw 192.168.0.2 #A2
+route add -net 192.168.2.0 netmask 255.255.255.0 gw 192.168.0.6 #A5
+route add -net 192.168.0.8 netmask 255.255.255.248 gw 192.168.0.6 #A6
+```
+
+Jalannkan script `rute.sh` di **SURABAYA** dan restart network dengan mengetikkan `service networking restart` di setiap UML. Untuk menguji koneksi antara subnet, terlebih dahulu diuji coba dengan mengetikkan `iptables –t nat –A POSTROUTING –o eth0 –j MASQUERADE –s 192.168.0.0/16` pada router **SURABAYA**. IP Tables dapat dimasukkan ke dalam *script*, dalam hal ini, nama script berupa `table.sh`.
+
+
+**(D)** Memberikan IP pada subnet **SIDOARJO** dan **GRESIK** secara dinamis menggunakan DHCP SERVER
 
 
 
