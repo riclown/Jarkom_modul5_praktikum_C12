@@ -5,7 +5,7 @@
 * 05111840000162 - [Fransiskus Xaverius Kevin Koesnadi](https://github.com/fxkevink)
 
 ## Daftar Isi
-* [Menggunakan VLSM](#vlsm)
+* [Pembuatan Topologi](#topologi)
 * [Soal 1](#soal-1)
 * [Soal 2](#soal-2)
 * [Soal 3](#soal-3)
@@ -15,7 +15,18 @@
 * [Soal 7](#soal-7)
 
 
-## VLSM
+## Topologi
+
+Membuat topologi jaringan sesuai dengan rancangan yang diberikan pada gambar di bawah ini:
+
+
+Melakukan subnetting dengan VLSM:
+
+
+Pembuaatarn Tree:
+
+
+
  ________ ___________ _________ 
 | Subnet |    Host   | Length  |
 |--------|-----------|---------|
@@ -27,8 +38,6 @@
 | A6     |  3        | 30      | 
 |Total   | 419       | 23      |
 --------------------------------
-
-
 
  ________ ___________ _________ ______________ ________________ ______________ 
 | Subnet | Jumlah IP | Submask |      NID     |     Netmask    | Broadcast ID |
