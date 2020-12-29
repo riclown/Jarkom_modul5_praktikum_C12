@@ -25,9 +25,9 @@ Keterangan:
 
 * **SURABAYA** diberikan IP Tuntap
 
-* **MALANG** merupakan **DNS Server** diberikan **IP DMZ**
+* **MALANG** merupakan **DNS Server** diberikan **IP DMZ** : `10.151.77.106`
 
-* **MOJOKERTO** merupakan **DHCP Server** diberikan **IP DMZ**
+* **MOJOKERTO** merupakan **DHCP Server** diberikan **IP DMZ** : `10.151.77.107`
 
 * **MADIUN** dan **PROBOLINGGO** merupakan **WEB Server**
 
@@ -259,12 +259,54 @@ route add -net 192.168.2.0 netmask 255.255.255.0 gw 192.168.0.6 #A5
 route add -net 192.168.0.8 netmask 255.255.255.248 gw 192.168.0.6 #A6
 ```
 
-Jalannkan script `rute.sh` di **SURABAYA** dan restart network dengan mengetikkan `service networking restart` di setiap UML. Untuk menguji koneksi antara subnet, terlebih dahulu diuji coba dengan mengetikkan `iptables –t nat –A POSTROUTING –o eth0 –j MASQUERADE –s 192.168.0.0/16` pada router **SURABAYA**. IP Tables dapat dimasukkan ke dalam *script*, dalam hal ini, nama script berupa `table.sh`.
-
+Jalannkan script `rute.sh` di **SURABAYA** dan restart network dengan mengetikkan `service networking restart` di setiap UML. Untuk menguji koneksi antara subnet, terlebih dahulu diuji coba dengan mengetikkan `iptables –t nat –A POSTROUTING –o eth0 –j MASQUERADE –s 192.168.0.0/16` pada router **SURABAYA**. IP Tables dapat dimasukkan ke dalam *script*, dalam hal ini, nama script berupa `table1.sh`.
 
 **(D)** Memberikan IP pada subnet **SIDOARJO** dan **GRESIK** secara dinamis menggunakan DHCP SERVER
 
+* Pada **SURABAYA**, **BATU**, **KEDIRI** lakukan instalasi **ISC-DHCP-Relay**. Lakukan perintah `apt-get update` pada ketiga uml tersebut dan masukkan *syntax* `apt-get install isc-dhcp-relay -y`, setelah instalasi selesai, masukkan syntax `nano /etc/default/isc-dhcp-relay`. Sesuaikan `isc-dhcp-relay` seperti pada gambar berikut:
 
+![Img](img/sbydhcp.jpg)
+
+![Img](img/kdrdhcp.jpg)
+
+![Img](img/batudhcp.jpg)
+
+Lakukan restart dhcp-server dengan `service isc-dhcp-relay restart`.
+
+* Pada **MOJOKERTO** lakukan instalasi **ISC-DHCP-Server**. Lakukan perintah `apt-get update` pada ketiga uml tersebut dan masukkan *syntax* `apt-get install isc-dhcp-server -y`, setelah instalasi selesai, masukkan syntax `nano /etc/default/isc-dhcp-server`. Sesuaikan `isc-dhcp-server` seperti pada gambar berikut:
+
+![Img](img/mojodhcp.jpg)
+
+Berikutnya masukkan *syntax* `nano /etc/dhcp/dhcpd.conf` dan lakukan konfigurasi:
+
+```
+subnet 10.151.77.104 netmask 255.255.255.248 {  
+    option routers 10.151.77.107; 
+}
+    
+subnet 192.168.1.0 netmask 255.255.255.0 {
+    option routers 10.151.77.105;
+    option broadcast-address 10.151.77.111;
+    option domain-name-servers 10.151.77.106;
+}
+
+subnet 192.168.2.0 netmask 255.255.255.0 {
+    option routers 10.151.77.105;
+    option broadcast-address 10.151.77.111;
+    option domain-name-servers 10.151.77.106;
+}
+```
+
+Lakukan restart dhcp-server dengan `service isc-dhcp-server restart`.
+
+Tambahkan pada interfaces setiap klien (**SIDOARJO** dan **GRESIK**):
+
+```
+auto eth0
+iface eth0 inet dhcp
+```
+
+Restart **SIDOARJO** dan **GRESIK** dengan `service networking restart`.
 
 ## Soal 1
 
