@@ -340,7 +340,7 @@ iptables -A FORWARD -d 10.151.77.104/29 -i eth0 -p tcp --dport 22 -j DROP
 
 Install **netcat** pada **MALANG** dengan `apt-get update` dan `apt-get install netcat -y`.
 
-Masukkan `nc -l -p <port>` pada uml dan `nc <ip_malang> <port>` pada putty atau wsl.
+Masukkan `nc -l -p <port>` pada uml **MALANG** dan `nc <ip_malang> <port>` pada putty atau wsl.
 
 * Uji 1 `port 23`: (Hanya untuk testing)
 
@@ -364,31 +364,63 @@ Lakukan ping ke **MALANG** atau **MOJOKERTO** dari 4 uml yang berbeda, dalam hal
 
 ## Soal 4
 
-Masukkan *syntax* iptables pada **MALANG** :
+Masukkan *syntax* iptables pada **MALANG**:
 
 ```
 iptables -A INPUT -s 192.168.1.0/24 -m time --timestart 07:00 --timestop 17:00 --weekdays Mon,Tue,Wed,Thu,Fri -j ACCEPT
 iptables -A INPUT -s 192.168.1.0/24 -j REJECT
 ```
 
-Lakukan ping ke **MALANG** dengan `ping 10.151.77.106` . Berdasarkan soal "hanya diperbolehkan pada pukul 07.00 - 17.00 pada hari Senin sampai Jumat", maka:
+Lakukan ping ke **MALANG** dari subnet **SIDOARJO** dengan `ping 10.151.77.106` . Berdasarkan soal "hanya diperbolehkan pada pukul 07.00 - 17.00 pada hari Senin sampai Jumat", maka:
 
 ![Img](img/4.2.jpg)
 
 ## Soal 5
 
-Masukkan *syntax* iptables pada **MALANG** :
+Masukkan *syntax* iptables pada **MALANG**:
 
 ```
 iptables -A INPUT -s 192.168.2.0/24 -m time --timestart 07:00 --timestop 17:00 -j REJECT
 ```
 
+Lakukan ping ke **MALANG** dari subnet **GRESIK** dengan `ping 10.151.77.106` . Berdasarkan soal "hanya diperbolehkan pada pukul 17.00 hingga pukul 07.00 setiap harinya", maka:
 
+![Img](img/5.2.jpg)
 
 ## Soal 6
 
+Masukkan *syntax* iptables pada **SURABAYA**:
 
+```
+iptables -A PREROUTING -t nat -p tcp -d 10.151.77.106 --dport 80 -m statistic --mode nth --every 2 --packet 0 -j DNAT --to-destination 192.168.0.10:80
+iptables -A PREROUTING -t nat -p tcp -d 10.151.77.106 --dport 80 -j DNAT --to-destination 192.168.0.11:80
+iptables -t nat -A POSTROUTING -p tcp -d 192.168.0.10 --dport 80 -j SNAT --to-source 10.151.77.106:80
+iptables -t nat -A POSTROUTING -p tcp -d 192.168.0.11 --dport 80 -j SNAT --to-source 10.151.77.106:80
+```
+Install **netcat** pada **PROBOLINGGO** dan **MADIUN** dengan `apt-get update` dan `apt-get install netcat -y`.
+
+Masukkan `nc -l -p <port>` pada uml **PROBOLINGGO** & **MADIUN** dan `nc <ip_malang> <port>` pada putty atau wsl.
+
+![Img](img/6.2.jpg)
 
 ## Soal 7
 
+Masukkan *syntax* iptables pada **SURABAYA**:
 
+```
+iptables -A FORWARD -d 10.151.77.104/29 -i eth0 -p tcp --dport 22 -j LOG --log-prefix "FORWARD TCP-DROPPED: "
+iptables -A FORWARD -d 10.151.77.104/29 -i eth0 -p tcp --dport 22 -j DROP #surabaya
+```
+
+Lakukan hal yang sama seperti nomor 2.  Masukkan `nc -l -p <port>` pada uml **MALANG** dan `nc <ip_malang> <port>` pada putty atau wsl. Hasil catatan log dapat dilihat di uml **SURABAYA** atau mengetik `tail /var/log/messages`.
+
+![Img](img/7.1.jpg)
+
+Masukkan *syntax* iptables pada **MALANG** dan **MOJOKERTO**:
+```
+iptables -A INPUT -p icmp -m connlimit --connlimit-above 3 --connlimit-mask 0 -j LOG --log-prefix "Connection Limit --> DROPPED : "
+iptables -A INPUT -p icmp -m connlimit --connlimit-above 3 --connlimit-mask 0 -j DROP
+```
+Lakukan hal yang sama seperti nomor 3. Lakukan ping ke **MALANG** dari 4 uml yang berbeda, dalam hal ini yaitu **KEDIRI**, **GRESIK**, **BATU**, **SIDOARJO** melakukan `ping 10.151.77.106`, hasilnya salah satu uml (**GRESIK**) ter-drop. Hasil catatan log dapat dilihat di uml **MALANG** atau mengetik `tail /var/log/messages`.
+
+![Img](img/7.3.jpg)
