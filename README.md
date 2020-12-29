@@ -318,7 +318,7 @@ iptables -t nat -F
 
 ## Soal 1
 
-Masukkan *syntax* berikut pada **SURABAYA** :
+Masukkan *syntax* iptables berikut pada **SURABAYA** :
 
 ```
 iptables -t nat -A POSTROUTING -s 192.168.0.0/16 -o eth0 -j SNAT --to-source 10.151.76.54
@@ -332,7 +332,7 @@ Lakukan ping keluar, contohnya di **SURABAYA** dan **MOJOKERTO**
 
 ## Soal 2
 
-Masukkan *syntax* berikut pada **SURABAYA** :
+Masukkan *syntax* iptables berikut pada **SURABAYA** :
 
 ```
 iptables -A FORWARD -d 10.151.77.104/29 -i eth0 -p tcp --dport 22 -j DROP
@@ -352,7 +352,7 @@ Masukkan `nc -l -p <port>` pada uml dan `nc <ip_malang> <port>` pada putty atau 
 
 ## Soal 3
 
-Masukkan *syntax* paad **MALANG** dan **MOJOKERTO**:
+Masukkan *syntax* iptables pada **MALANG** dan **MOJOKERTO**:
 
 ```
 iptables -A INPUT -p icmp -m connlimit --connlimit-above 3 --connlimit-mask 0 -j DROP
@@ -364,9 +364,24 @@ Lakukan ping ke **MALANG** atau **MOJOKERTO** dari 4 uml yang berbeda, dalam hal
 
 ## Soal 4
 
+Masukkan *syntax* iptables pada **MALANG** :
 
+```
+iptables -A INPUT -s 192.168.1.0/24 -m time --timestart 07:00 --timestop 17:00 --weekdays Mon,Tue,Wed,Thu,Fri -j ACCEPT
+iptables -A INPUT -s 192.168.1.0/24 -j REJECT
+```
+
+Lakukan ping ke **MALANG** dengan `ping 10.151.77.106` . Berdasarkan soal "hanya diperbolehkan pada pukul 07.00 - 17.00 pada hari Senin sampai Jumat", maka:
+
+![Img](img/4.2.jpg)
 
 ## Soal 5
+
+Masukkan *syntax* iptables pada **MALANG** :
+
+```
+iptables -A INPUT -s 192.168.2.0/24 -m time --timestart 07:00 --timestop 17:00 -j REJECT
+```
 
 
 
