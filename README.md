@@ -423,4 +423,4 @@ iptables -A INPUT -p icmp -m connlimit --connlimit-above 3 --connlimit-mask 0 -j
 ```
 Lakukan hal yang sama seperti nomor 3. Lakukan ping ke **MALANG** dari 4 uml yang berbeda, dalam hal ini yaitu **KEDIRI**, **GRESIK**, **BATU**, **SIDOARJO** melakukan `ping 10.151.77.106`, hasilnya salah satu uml (**GRESIK**) ter-drop. Hasil catatan log dapat dilihat di uml **MALANG** atau mengetik `tail /var/log/messages`.
 
-![Img](img/7.3.jpg)
+![Img](img/7.4.jpg)
