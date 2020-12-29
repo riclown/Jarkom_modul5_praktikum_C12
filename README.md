@@ -308,19 +308,72 @@ iface eth0 inet dhcp
 
 Restart **SIDOARJO** dan **GRESIK** dengan `service networking restart`.
 
+*Notes: Jika sebelumnya terdapat syntax iptables lain di suatu uml, masukkan syntax*
+
+```
+iptables -F
+iptables -t nat -F
+```
+
+
 ## Soal 1
+
+Masukkan *syntax* berikut pada **SURABAYA** :
+
+```
+iptables -t nat -A POSTROUTING -s 192.168.0.0/16 -o eth0 -j SNAT --to-source 10.151.76.54
+```
+
+Lakukan ping keluar, contohnya di **SURABAYA** dan **MOJOKERTO**
+
+![Img](img/1a.jpg)
+
+![Img](img/1b.jpg)
 
 ## Soal 2
 
+Masukkan *syntax* berikut pada **SURABAYA** :
+
+```
+iptables -A FORWARD -d 10.151.77.104/29 -i eth0 -p tcp --dport 22 -j DROP
+```
+
+Install **netcat** pada **MALANG** dengan `apt-get update` dan `apt-get install netcat -y`.
+
+Masukkan `nc -l -p <port>` pada uml dan `nc <ip_malang> <port>` pada putty atau wsl.
+
+* Uji 1 `port 23`: (Hanya untuk testing)
+
+![Img](img/2.1.jpg)
+
+* Uji 2 `port 22`
+
+![Img](img/2.4.jpg)
+
 ## Soal 3
+
+Masukkan *syntax* paad **MALANG** dan **MOJOKERTO**:
+
+```
+iptables -A INPUT -p icmp -m connlimit --connlimit-above 3 --connlimit-mask 0 -j DROP
+```
+
+Lakukan ping ke **MALANG** atau **MOJOKERTO** dari 4 uml yang berbeda, dalam hal ini yaitu **KEDIRI**, **GRESIK**, **BATU**, **SIDOARJO** melakukan `ping 10.151.77.106`, hasilnya salah satu uml (**BATU**) ter-drop.
+
+![Img](img/3.8.jpg)
 
 ## Soal 4
 
+
+
 ## Soal 5
 
+
+
 ## Soal 6
+
+
 
 ## Soal 7
 
 
-## Kendala
